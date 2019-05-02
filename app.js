@@ -96,16 +96,36 @@ app.get("/", function(req, res) {
 
 app.post("/", function(req, res){
 
-  const item = req.body.newItem;
+  // When the post route is triggered, we can refer to req.body.newItem
+  // This refers to the text the user enters when they click the "+" button
+  //   in the list.ejs file
+  // We are saving this into a constant called itemName
 
-  if (req.body.list === "Work") {
-    workItems.push(item);
-    res.redirect("/work");
-  } else {
-    items.push(item);
-    res.redirect("/");
-  }
+  const itemName = req.body.newItem;
+
+  // now we need to create a new Item document based off my model in mongoDB
+
+  const item = new Item ({
+    name: itemName
+  });
+
+  // then we can use use the mongoose shortcut to save this item to our list
+  item.save();
+
+  // after we save our item, we reroute the page to the home route and find
+  //  all the items in our items collection and render it on the screen
+  res.redirect("/");
+
 });
+
+// add new post route that targets the /delete route
+app.post("/delete", function(req, res){
+  // in this post we are simply going to console log the request.body, so basically
+  //   what is being sent over from our form in our list.ejs file
+  console.log(req.body.checkbox);
+
+});
+
 
 app.get("/work", function(req,res){
   res.render("list", {listTitle: "Work List", newListItems: workItems});
