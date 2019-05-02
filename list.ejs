@@ -1,0 +1,37 @@
+<%- include("header") -%>
+
+  <div class="box" id="heading">
+    <h1> <%= listTitle %> </h1>
+  </div>
+
+  <div class="box">
+
+    <% newListItems.forEach(function(item){ %>
+
+      <!-- this form is responsible for deleting items -->
+      <!-- it is supposed to make a post requrest to a new delete route, "/delete" -->
+      <form action="/delete" method="post">
+
+        <div class="item">
+          <!-- in order for the form to trigger when the checkbox is clicked we need to add
+          an onChange attribute to the input element -->
+          <!-- whenever the checkbox gets clicked (from unchecked to checked, from checked to unchecked etc.)
+          this JavaScript snippet gets triggered: the JavaScript code submits what's in the form
+          to make the post request to our /delete route -->
+          <input type="checkbox" name="checkbox" onChange="this.form.submit()"
+          <p><%=  item.name  %></p>
+        </div>
+
+      </form>
+
+    <%  }); %>
+
+      <!-- This form is responsible for adding new items -->
+      <form class="item" action="/" method="post">
+        <!-- this is what the req.body.newItem in our post route in app.js refers to -->
+        <input type="text" name="newItem" placeholder="New Item" autocomplete="off">
+        <button type="submit" name="list">+</button>
+      </form>
+  </div>
+
+<%- include("footer") -%>
