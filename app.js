@@ -122,7 +122,19 @@ app.post("/", function(req, res){
 app.post("/delete", function(req, res){
   // in this post we are simply going to console log the request.body, so basically
   //   what is being sent over from our form in our list.ejs file
-  console.log(req.body.checkbox);
+  const checkedItemId = req.body.checkbox;
+
+  // we tap into the items collection using the Item model
+  // only if there is a callback function can the item be deleted
+  Item.findByIdAndRemove(checkedItemId, function(err){
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("Item with id " + checkedItemId + " successfully removed");
+    }
+  });
+
+  res.redirect("/")
 
 });
 
