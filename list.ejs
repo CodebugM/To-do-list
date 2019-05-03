@@ -18,7 +18,7 @@
           <!-- whenever the checkbox gets clicked (from unchecked to checked, from checked to unchecked etc.)
           this JavaScript snippet gets triggered: the JavaScript code submits what's in the form
           to make the post request to our /delete route -->
-          <input type="checkbox" name="checkbox" onChange="this.form.submit()"
+          <input type="checkbox" name="checkbox" value="<%= item._id %>" onChange="this.form.submit()"
           <p><%=  item.name  %></p>
         </div>
 
