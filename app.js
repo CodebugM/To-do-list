@@ -52,6 +52,21 @@ const callMum = new Item ({
 // new array to hold the default items
 const defaultItems = [almondMilk, walk, callMum];
 
+// new listSchema to allow us to create new documents when the user enters a new list name
+const listSchema = {
+  name: String,
+  items: [itemsSchema]
+};
+
+// the next step after creating the new listSchema schema is to create a mongoose model
+// as always, we put in the singular version of our collection, which is a list
+// and we specify the schema, in this case the listSchema
+const List = mongoose.model("List", listSchema);
+
+// now that we have created our List model from our listSchema, we are ready to create some
+//  new list documents based off this model. We are going to do that when a user puts in a
+//  custom list name --> below where it says app.get("/:customListName", function(req,res){})
+
 app.get("/", function(req, res) {
 
   // Step 6: Use mongoose's find() method to log all the items in our items collection
@@ -93,6 +108,31 @@ app.get("/", function(req, res) {
   // instead of using the date as before
 
 });
+
+// create a dynamic route in express based on the route parameters, so we can access a Home and a Work list
+// e.g. localhost:3000/Home and localhost:3000/Work
+
+app.get("/:customListName", function(req,res){
+
+  // let's save whatever the user enters after the forward slash after the web address localhost:3000 into a constant
+  const customListName = req.params.customListName;
+
+  // create a new list based off our List model, filling in the two required field
+  //   the name of the new list is simply the mame the user put in
+  //   the second field, "items", should accept an array of items
+  //   --> we are simply going to start off with the same default array we used previously
+  const list = new List ({
+    name: customListName,
+    items: defaultItems
+  });
+
+  // after we created our new document, all we have to do now is to save it into our lists collection
+  list.save();
+
+});
+
+
+
 
 app.post("/", function(req, res){
 
@@ -138,10 +178,6 @@ app.post("/delete", function(req, res){
 
 });
 
-
-app.get("/work", function(req,res){
-  res.render("list", {listTitle: "Work List", newListItems: workItems});
-});
 
 app.get("/about", function(req, res){
   res.render("about");
