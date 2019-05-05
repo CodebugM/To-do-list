@@ -74,7 +74,7 @@ app.get("/", function(req, res) {
   // we want to find all items in our collection (i.e. there are no conditions),
   //  so we specify that using a set of curly braces - this finds us everything inside
   //  our items collection
-  Item.find({}, function(err, foundItems){
+  Item.find({}, function(err, foundItems) {
 
       // if there are currently no items in the collection, we want to add our
       //  default items
@@ -117,20 +117,45 @@ app.get("/:customListName", function(req,res){
   // let's save whatever the user enters after the forward slash after the web address localhost:3000 into a constant
   const customListName = req.params.customListName;
 
-  // create a new list based off our List model, filling in the two required field
-  //   the name of the new list is simply the mame the user put in
-  //   the second field, "items", should accept an array of items
-  //   --> we are simply going to start off with the same default array we used previously
-  const list = new List ({
-    name: customListName,
-    items: defaultItems
+  // inside the collection of lists, find me a list with the same name as the one the user is
+  //   currently trying to access
+  // the callback function has two parameters, error and foundList
+  //   so if there was an error, we'll print it but if there wasn't, we'll tap into what was found
+  // Side note: the mongoose find() methods finds ALL items in a list and gives us an array back while the
+  //   findOne() method gives us an object/document back if it is found
+  List.findOne({
+    name: customListName
+  }, function(err, foundList) {
+    if (!err) {
+      // if there were no errors, we'll check to see whether there is or there isn't a foundList
+      // if foundList doesn't exist (!foundList), do X...
+
+      if (!foundList) {
+        // ** this is the path where we create a new list **
+        // create a new list based off our List model, filling in the two required field
+        //   the name of the new list is simply the mame the user put in
+        //   the second field, "items", should accept an array of items
+        //   --> we are simply going to start off with the same default array we used previously
+        const list = new List({
+          name: customListName,
+          items: defaultItems
+        });
+
+        // after we created our new document, all we have to do now is to save it into our lists collection
+        list.save();
+        // after we saved the list we need to display the list the user just created
+        // we can do that by redirecting back to the CURRENT route, by concatenating the customListName at the end
+        res.redirect("/" + customListName);
+
+      } else {
+        // ** this is the path where we should show an existing list **
+        // here we tap into the foundList from up above in our "function(err, foundList)"
+        //   we need to tap into the name and items properties of the foundList
+        res.render("list", {listTitle: foundList.name, newListItems: foundList.items});
+      }
+    }
   });
-
-  // after we created our new document, all we have to do now is to save it into our lists collection
-  list.save();
-
-});
-
+}); // closing tags of app.get()
 
 
 
