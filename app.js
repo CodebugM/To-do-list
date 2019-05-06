@@ -167,20 +167,47 @@ app.post("/", function(req, res){
   // We are saving this into a constant called itemName
 
   const itemName = req.body.newItem;
+  // by adding a value attribute to the submit button in the form in our list.ejs file, we get
+  //   access to the name of the list we are currently in
+  // the value of req.body.list is going to be the value of the current list the user is trying
+  //   to add an item to, referred to by <%= listTitle %> in the ejs file
+  const listName = req.body.list;
 
   // now we need to create a new Item document based off my model in mongoDB
-
   const item = new Item ({
     name: itemName
   });
 
-  // then we can use use the mongoose shortcut to save this item to our list
-  item.save();
+  // if we want to add an item to our today/default list, we need to handle it differently
+  //   than if it was from a custom list
+  // an if statement can check for that
+  // if the name of the list we are currently in is "Today", we are probably in the default list
+  //   - in this case we simply save the new item to our Items list and redirect to the home route
+  if(listName === "Today") {
+    // use the mongoose shortcut to save this item to our list
+    item.save();
+    // after we save our item, we reroute the page to the home route and find
+    //  all the items in our items collection and render it on the screen
+    res.redirect("/");
+  }
+  // but: if the name of our list isn't "Today" our new item comes from a custom list
+  //   in that case we need to look for that list in our lists collection in our database and then
+  //   save the new item to the existing array of items.
+  else {
+    // we are looking for a list with the name value of listName, and once we found it we use
+    //   the callback function with the error and the foundList
+    List.findOne({name: listName}, function(err, foundList) {
+      // we can now tap into the foundList document to look for its array of items and add our new item
+      // foundList.items taps into the embedded array of items from the const listSchema (lines 56-59)
+      // then we use the JS push function to push a new item onto the array of items
+      // the item we want to push is the one we just created of what the user typed in (line 179)
+      foundList.items.push(item);
+      foundList.save();
 
-  // after we save our item, we reroute the page to the home route and find
-  //  all the items in our items collection and render it on the screen
-  res.redirect("/");
-
+      // then we redirect to the route the user came from
+      res.redirect("/" + listName);
+    });
+  }
 });
 
 // add new post route that targets the /delete route
