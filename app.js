@@ -215,20 +215,41 @@ app.post("/delete", function(req, res){
   // in this post we are simply going to console log the request.body, so basically
   //   what is being sent over from our form in our list.ejs file
   const checkedItemId = req.body.checkbox;
+  // because of the input of type="hidden" in the list.ejs file (line 27), we can tap into the name
+  //   of the list we are currently trying to delete items from
+  const listName = req.body.listName;
 
-  // we tap into the items collection using the Item model
-  // only if there is a callback function can the item be deleted
-  Item.findByIdAndRemove(checkedItemId, function(err){
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("Item with id " + checkedItemId + " successfully removed");
-    }
-  });
+  // like in the post request above where we save new items, we need an if statement to check
+  //   whether we are in the default list or a custom list
+  if (listName === "Today") {
 
-  res.redirect("/")
+    // we tap into the items collection using the Item model
+    // Caution! Only if there is a callback function can the item be deleted
+    Item.findByIdAndRemove(checkedItemId, function(err){
+      if (!err) {
+        console.log("Item with id " + checkedItemId + " successfully removed");
+        res.redirect("/");
+      }
+    });
 
-});
+  } else {
+  // else, if we are in a custom list the delete request comes from that custom list
+  // we need to find the list document with the current listName and then update that list
+  //   to remove the checked item with the particular checkedItemId
+  // Because in the listSchema the items field is assigned an array, we now have to look inside
+  //   the array of items for the particular item we are trying to delete
+
+  // Instead of just relying on JavaScript we can use mongoose's $pull operator, which removes
+  //   from an existing array all instances of a value or values that match a specified condition.
+  // * https://docs.mongodb.com/manual/reference/operator/update/pull/ *
+  // This in combination with the mongoose method fineOneAndUpadte() in order to achieve our result more effectively
+  // All operators preceded by the $-sign come from mongoDB 
+
+
+  }
+
+
+
 
 
 app.get("/about", function(req, res){
