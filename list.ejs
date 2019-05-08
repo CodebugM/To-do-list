@@ -1,37 +1,40 @@
 <%- include("header") -%>
 
-  <div class="box" id="heading">
-    <h1> <%= listTitle %> </h1>
-  </div>
+<div class="box" id="heading">
+  <h1>
+    <%= listTitle %>
+  </h1>
+</div>
 
-  <div class="box">
+<div class="box">
 
-    <% newListItems.forEach(function(item){ %>
+  <% newListItems.forEach(function(item){ %>
 
-      <!-- this form is responsible for deleting items -->
-      <!-- it is supposed to make a post requrest to a new delete route, "/delete" -->
-      <form action="/delete" method="post">
+  <!-- this form is responsible for deleting items -->
+  <!-- it is supposed to make a post requrest to a new delete route, "/delete" -->
+  <form action="/delete" method="post">
 
-        <div class="item">
-          <!-- in order for the form to trigger when the checkbox is clicked we need to add
+    <div class="item">
+      <!-- in order for the form to trigger when the checkbox is clicked we need to add
           an onChange attribute to the input element -->
-          <!-- whenever the checkbox gets clicked (from unchecked to checked, from checked to unchecked etc.)
+      <!-- whenever the checkbox gets clicked (from unchecked to checked, from checked to unchecked etc.)
           this JavaScript snippet gets triggered: the JavaScript code submits what's in the form
           to make the post request to our /delete route -->
-          <input type="checkbox" name="checkbox" value="<%= item._id %>" onChange="this.form.submit()"
-          <p><%=  item.name  %></p>
-        </div>
-
+      <input type="checkbox" name="checkbox" value="<%= item._id %>" onChange="this.form.submit()" <p>
+      <%=  item.name  %>
+      </p>
+    </div>
+    <input type="hidden" name="listName" value="<%= listTitle></input>
       </form>
 
     <%  }); %>
 
       <!-- This form is responsible for adding new items -->
-      <form class="item" action="/" method="post">
-        <!-- this is what the req.body.newItem in our post route in app.js refers to -->
-        <input type="text" name="newItem" placeholder="New Item" autocomplete="off">
-        <button type="submit" name="list" value="<%= listTitle %>">+</button>
-      </form>
-  </div>
+      <form class=" item" action="/" method="post">
+    <!-- this is what the req.body.newItem in our post route in app.js refers to -->
+    <input type="text" name="newItem" placeholder="New Item" autocomplete="off">
+    <button type="submit" name="list" value="<%= listTitle %>">+</button>
+  </form>
+</div>
 
 <%- include("footer") -%>
