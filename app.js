@@ -4,6 +4,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 // Step 1: require mongoose
 const mongoose = require("mongoose");
+const _ = require("lodash");
 
 const app = express();
 
@@ -115,7 +116,8 @@ app.get("/", function(req, res) {
 app.get("/:customListName", function(req,res){
 
   // let's save whatever the user enters after the forward slash after the web address localhost:3000 into a constant
-  const customListName = req.params.customListName;
+  // but instead of saving whatever the user entered we are going to capitalise the first letter using lodash
+  const customListName = _.capitalize(req.params.customListName);
 
   // inside the collection of lists, find me a list with the same name as the one the user is
   //   currently trying to access
@@ -243,10 +245,41 @@ app.post("/delete", function(req, res){
   //   from an existing array all instances of a value or values that match a specified condition.
   // * https://docs.mongodb.com/manual/reference/operator/update/pull/ *
   // This in combination with the mongoose method fineOneAndUpadte() in order to achieve our result more effectively
-  // All operators preceded by the $-sign come from mongoDB 
+  // All operators preceded by the $-sign come from mongoDB
 
+  // we first specify the model, which corresponds to the collection we want to find one and update from
+  //   inside we provide 3 things: first, the conditions of the things we want to find,
+  //   second, what we want to update, and third, a callback where we get a result based on what our
+  //   conditions found
+  // inside the {updates} part we want to use the $pull operator as the key, and then the value
+  //   has to be the field we want to pull from, so an array of something, in our case an array
+  //   of items; and then for the field we need to specify which item in the array of items we
+  //   actually want to pull
+  // the syntax [for the update part] look like this: {$pull: {field: {_id: value}}}
+  //   it is essentially saying: we want to pull from a particular array an item, and the  way
+  //   we are going to find that item is through its id or through its name or whatever it is and then
+  //   we have to provide the value
 
+  // we tap into our List model and the specify three things:
+  //   1) the condition: what list do we want to find - we are only going to get one back
+  //   2) what updates do we want to make
+  //   3) a callback function
+
+  List.findOneAndUpdate(
+    // the name of the list we are looking for is the name of our custom list
+    {name: listName},
+    // we have to provide the name of the array inside the list that we found
+    // the items array is the only array inside our list document
+    {$pull: {items: {_id: checkedItemId}}},
+    // callback function
+    // the findOne() in our findOneAndUpdate() function corresponds to finding a list
+    function (err, foundList) {
+      if(!err) {
+        res.redirect("/" + listName);
+      }
+    });
   }
+});
 
 
 
