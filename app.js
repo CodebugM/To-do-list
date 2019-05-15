@@ -17,10 +17,12 @@ app.use(express.static("public"));
 // create a new database inside mongoDB using mongoose.connect()
 // the thing we are connecting to is the url where our mongoDB is hosted locally
 // typically this url is mongodb://localhost:27017
+// edit: in order to connect to our mongoDB cluster to save our data in the mongo
+// Atlas cloud, we copy over the connection string our cluster specifies
 // putting another forward slash after this address allows you to specify the
 //  name of your database, like /databasename
 // to avoid the deprecation warning add the flag {useNewUrlParser: true}
-mongoose.connect("mongodb://localhost:27017/todolistDB", {useNewUrlParser: true});
+mongoose.connect("mongodb+srv://admin-marlene:test123@cluster0-ncddy.mongodb.net/todolistDB", {useNewUrlParser: true});
 
 // Step 3: Create a new items schema
 const itemsSchema = {
